@@ -1,5 +1,7 @@
 package org.workshop;
 
+import org.hamcrest.Matchers;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import javax.naming.OperationNotSupportedException;
@@ -9,6 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertEquals;
 
 public class SumTest {
@@ -16,45 +19,57 @@ public class SumTest {
     private Sum sum = new Sum();
 
     @Test
-    public void sum1() throws Exception{
+    public void sum1() throws Exception {
         assertEquals(1, sum.sumFrom1To(1));
     }
 
     @Test
-    public void sum2() throws Exception{
+    public void sum2() throws Exception {
         assertEquals(3, sum.sumFrom1To(2));
     }
 
     @Test
-    public void sum10() throws Exception{
+    public void sum10() throws Exception {
         assertEquals(55, sum.sumFrom1To(10));
     }
 
     @Test(expectedExceptions = OperationNotSupportedException.class)
-    public void sumFailed() throws Exception{
+    public void sumFailed() throws Exception {
         sum.sumFrom1To(-1);
     }
 
     @Test
-    public void sumEmptyList() throws Exception{
+    public void sumEmptyList() throws Exception {
         assertEquals(0, sum.sumAList(new ArrayList<>()));
     }
 
     @Test
-    public void sumOneElementList() throws Exception{
+    public void sumOneElementList() throws Exception {
         assertEquals(1, sum.sumAList(Collections.singletonList(1)));
     }
 
     @Test
-    public void sum10elementsList() throws Exception{
+    public void sum10elementsList() throws Exception {
         List<Integer> toSum = IntStream.range(1, 11).boxed().collect(Collectors.toList());
         assertEquals(55, sum.sumAList(toSum));
     }
 
     @Test(expectedExceptions = OperationNotSupportedException.class)
-    public void sumAListFailed() throws Exception{
+    public void sumAListFailed() throws Exception {
         sum.sumAList(null);
     }
 
+    @Test(dataProvider = "sumData")
+    public void sumTest(int limit, int expected) throws OperationNotSupportedException {
+        assertThat(sum.sumFrom1To(limit), Matchers.equalTo(expected));
+    }
+
+    @DataProvider(name = "sumData")
+    public Object[][] sumDataProvider() {
+        return new Object[][]{
+                {1, 1},
+                {2, 3}
+        };
+    }
 
 }
