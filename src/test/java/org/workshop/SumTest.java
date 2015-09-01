@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.assertEquals;
 
 public class SumTest {
@@ -38,22 +39,6 @@ public class SumTest {
         sum.sumFrom1To(-1);
     }
 
-    @Test
-    public void sumEmptyList() throws Exception {
-        assertEquals(0, sum.sumAList(new ArrayList<>()));
-    }
-
-    @Test
-    public void sumOneElementList() throws Exception {
-        assertEquals(1, sum.sumAList(Collections.singletonList(1)));
-    }
-
-    @Test
-    public void sum10elementsList() throws Exception {
-        List<Integer> toSum = IntStream.range(1, 11).boxed().collect(Collectors.toList());
-        assertEquals(55, sum.sumAList(toSum));
-    }
-
     @Test(expectedExceptions = OperationNotSupportedException.class)
     public void sumAListFailed() throws Exception {
         sum.sumAList(null);
@@ -61,14 +46,32 @@ public class SumTest {
 
     @Test(dataProvider = "sumData")
     public void sumTest(int limit, int expected) throws OperationNotSupportedException {
-        assertThat(sum.sumFrom1To(limit), Matchers.equalTo(expected));
+        assertThat(sum.sumFrom1To(limit), equalTo(expected));
     }
 
     @DataProvider(name = "sumData")
     public Object[][] sumDataProvider() {
         return new Object[][]{
                 {1, 1},
-                {2, 3}
+                {2, 3},
+                {3, 6}
+        };
+    }
+
+    @Test(dataProvider = "listSum")
+    public void sumAListTest(List<Integer> listToSum, int expected) throws OperationNotSupportedException {
+        assertThat(sum.sumAList(listToSum), equalTo(expected));
+    }
+
+    @DataProvider(name = "listSum")
+    public Object[][] sumAListDataProvider() {
+        List<Integer> list = new ArrayList<>();
+        list.add(1);
+        list.add(7);
+        return new Object[][]{
+                {new ArrayList<Integer>(), 0},
+                {list, 8},
+                {IntStream.range(1, 11).boxed().collect(Collectors.toList()), 55}
         };
     }
 
